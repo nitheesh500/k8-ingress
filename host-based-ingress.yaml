@@ -1,0 +1,58 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: demo-ingress
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+spec:
+  rules:
+  - host: app1.daws82s.online
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: svc-app1
+            port:
+              number: 80
+
+  - host: app2.daws82s.online
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: svc-app2
+            port:
+              number: 80
+
+
+# Why the word “backend”?
+
+# Because in networking and load balancers:
+
+# Frontend = where traffic comes IN
+
+# Backend = where traffic goes OUT
+
+# Kubernetes follows this same naming.
+
+# So they named the destination section → backend:
+
+# Instead of naming it:
+
+# target
+
+# destination
+
+# service_route
+
+# output
+
+# next_hop
+
+# They simply followed load balancer standard terminology: backend.
