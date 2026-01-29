@@ -19,11 +19,12 @@ AWS ALB or NGINX external IP
 3️⃣ Load Balancer receives traffic
 
 4️⃣ Ingress Controller checks routing rules
+
 It looks at:
 
-Host (example.com)
+- Host (example.com)
+- Path (/app1)
 
-Path (/app1)
 
 5️⃣ Ingress Controller sends traffic to the correct Kubernetes service
 For /app1 → svc-app1
@@ -91,3 +92,49 @@ You should see:
 
 aws-load-balancer-controller-xxxxx   Running
 aws-load-balancer-controller-yyyyy   Running
+
+
+----
+## new setup
+
+1️⃣ Download the latest official policy
+```
+curl -o aws-lb-controller-policy.json \
+https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json
+```
+2️⃣ Create a NEW policy version and set it as DEFAULT
+```
+aws iam create-policy-version \
+  --policy-arn arn:aws:iam::992382567167:policy/AWSLoadBalancerControllerIAMPolicy \
+  --policy-document file://aws-lb-controller-policy.json \
+  --set-as-default
+```
+
+👉 This does NOT delete the old version
+👉 It replaces v1 as the active policy
+
+3️⃣ Verify the permission exists now (IMPORTANT)
+```
+aws iam get-policy-version \
+  --policy-arn arn:aws:iam::992382567167:policy/AWSLoadBalancerControllerIAMPolicy \
+  --version-id v2
+```
+
+You must see:
+```
+"elasticloadbalancing:DescribeListenerAttributes"
+```
+4️⃣ Restart the controller (MANDATORY)
+
+IAM changes do NOT apply to running pods.
+```
+kubectl rollout restart deployment aws-load-balancer-controller -n kube-system
+```
+
+Wait ~30–60 seconds.
+
+5️⃣ Force a clean ingress reconcile
+```
+kubectl delete ingress petclinic-ingress
+helm upgrade --install pet .
+```

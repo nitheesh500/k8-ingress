@@ -8,8 +8,8 @@ metadata:
     alb.ingress.kubernetes.io/target-type: ip
 spec:
   rules:
-  - host: daws82s.online
-    http:
+  #- host: daws82s.online
+  - http:
       paths:
       - path: /app1
         pathType: Prefix
