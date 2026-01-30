@@ -3,8 +3,10 @@ set -euo pipefail
 
 # ============== CONFIG ==================
 CLUSTER_NAME="demo-cluster"
+VPC_ID="demo-vpc-123"
 AWS_REGION="us-east-1"
 ACCOUNT_ID="992382567166"
+
 
 NAMESPACE="kube-system"
 SERVICE_ACCOUNT="aws-load-balancer-controller"
@@ -16,10 +18,17 @@ HELM_RELEASE="aws-load-balancer-controller"
 HELM_REPO_NAME="eks"
 HELM_REPO_URL="https://aws.github.io/eks-charts"
 
-VPC_ID="demo-vpc-123"
-# ========================================
 
-echo "🚀 Starting FULL AWS Load Balancer Controller setup"
+# ========================================
+# Cluster existence check
+echo " Checking for cluster"
+aws eks describe-cluster \
+  --name "${CLUSTER_NAME}" \
+  --region "${REGION}" \
+  >/dev/null \
+  || { echo "❌ EKS cluster '${CLUSTER_NAME}' not found"; exit 1; }
+
+echo "🚀 Starting AWS Load Balancer Controller setup"
 
 # ---------- STEP 1: Associate OIDC ----------
 echo "🔗 Step 1: Associating IAM OIDC provider (idempotent)..."
