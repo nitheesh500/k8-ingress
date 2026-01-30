@@ -8,6 +8,7 @@ AWS_REGION="us-east-1"
 ACCOUNT_ID="992382567166"
 
 
+
 NAMESPACE="kube-system"
 SERVICE_ACCOUNT="aws-load-balancer-controller"
 
