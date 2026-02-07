@@ -67,7 +67,7 @@ set -euo pipefail
 # ============== CONFIG ==================
 CLUSTER_NAME="myk8cluster"
 AWS_REGION="us-east-1"
-ACCOUNT_ID="992382567166"
+ACCOUNT_ID="992382567167"
 
 
 
@@ -116,19 +116,7 @@ EXISTING_POLICY_ARN=$(aws iam list-policies \
 if [[ -n "$EXISTING_POLICY_ARN" && "$EXISTING_POLICY_ARN" != "None" ]]; then
   echo "✅ Policy exists: $EXISTING_POLICY_ARN"
 
-  echo "🧹 Cleaning up old non-default policy versions..."
 
-  OLD_VERSIONS=$(aws iam list-policy-versions \
-    --policy-arn "$EXISTING_POLICY_ARN" \
-    --query "Versions[?IsDefaultVersion==\`false\`].VersionId" \
-    --output text)
-
-  for VERSION in $OLD_VERSIONS; do
-    echo "🗑️ Deleting policy version: $VERSION"
-    aws iam delete-policy-version \
-      --policy-arn "$EXISTING_POLICY_ARN" \
-      --version-id "$VERSION"
-  done
 
   echo "🔄 Creating new policy version and setting as default..."
   aws iam create-policy-version \
